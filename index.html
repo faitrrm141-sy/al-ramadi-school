@@ -23,8 +23,6 @@
             }
         }
     </script>
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Cairo Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -104,17 +102,8 @@
 
     <!-- Application Script Logic -->
     <script>
-        // إعدادات اتصال Supabase بالمفتاح العام الصحيح
         const SUPABASE_URL = 'https://vvuyzlaomnpasnzljqlo.supabase.co';
-        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ny6Xjk-7TdgMcYRHdYDYzg_mKHyTRVi';
-
-        let supabaseClient = null;
-        try {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-            console.log('Supabase Initialized Successfully');
-        } catch (e) {
-            console.error('Supabase initialization error:', e);
-        }
+        const SUPABASE_KEY = 'sb_publishable_ny6Xjk-7TdgMcYRHdYDYzg_mKHyTRVi';
 
         function openLoginModal() {
             document.getElementById('login-modal').style.display = 'flex';
@@ -133,40 +122,58 @@
             }
 
             try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) throw error;
+                // استخدام الاتصال المباشر لضمان تجاوز أي مشاكل في المكتبة
+                const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
                 
+                if (!response.ok) {
+                    throw new Error(data.error_description || data.msg || data.message || 'فشل تسجيل الدخول');
+                }
+
                 alert('تم تسجيل الدخول بنجاح!');
                 closeLoginModal();
-                loadUserDashboard(data.user);
+                loadUserDashboard(email);
             } catch (err) {
-                console.error('Login error details:', err);
-                alert('خطأ في تسجيل الدخول: ' + (err.message || 'تعذر الاتصال بالخادم'));
+                console.error('Login error:', err);
+                alert('خطأ في تسجيل الدخول: ' + err.message);
             }
         }
 
-        function loadUserDashboard(user) {
+        function loadUserDashboard(email) {
             document.getElementById('main-view').classList.add('hidden');
             const dash = document.getElementById('dashboard-view');
             dash.classList.remove('hidden');
             dash.innerHTML = `
                 <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
                     <h2 class="text-xl font-bold text-brand-800">مرحباً بك في لوحة التحكم</h2>
-                    <p class="text-sm text-slate-600">تم تسجيل الدخول بنجاح بحسابك (${user.email}).</p>
+                    <p class="text-sm text-slate-600">تم تسجيل الدخول بنجاح بحسابك (${email}).</p>
                     <button onclick="location.reload()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold">تسجيل الخروج</button>
                 </div>
             `;
         }
 
-        // جلب الدليل العام من قاعدة البيانات
+        // جلب الدليل العام
         window.addEventListener('DOMContentLoaded', async () => {
             const dirDiv = document.getElementById('public-staff-directory');
-            if (!supabaseClient) return;
-            
             try {
-                const { data, error } = await supabaseClient.from('profiles').select('full_name, role').limit(6);
-                if (error || !data || data.length === 0) {
-                    dirDiv.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-500 col-span-full">لا توجد بيانات مسجلة في الدليل حالياً. أضف مستخدمين من لوحة الإدارة.</div>`;
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=full_name,role&limit=6`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (!response.ok || !data || data.length === 0) {
+                    dirDiv.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-500 col-span-full">لا توجد بيانات مسجلة في الدليل حالياً.</div>`;
                     return;
                 }
                 
@@ -177,7 +184,8 @@
                     </div>
                 `).join('');
             } catch (e) {
-                console.error('Directory fetch error:', e);
+                console.error('Directory error:', e);
+                dirDiv.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-500 col-span-full">تعذر جلب البيانات حالياً.</div>`;
             }
         });
     </script>
