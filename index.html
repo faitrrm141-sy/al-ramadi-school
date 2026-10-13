@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة مدرسة الرمادي المحدثة</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,8 +23,9 @@
             }
         }
     </script>
-    <!-- Supabase JS Client -->
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Cairo Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; }
@@ -33,77 +34,86 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
     <!-- Navbar -->
-    <header class="bg-gradient-to-r from-brand-800 to-brand-600 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-gradient-to-r from-brand-800 to-brand-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="bg-brand-teal p-2 rounded-xl text-white font-bold text-xl">🏫</div>
+                <div class="bg-brand-teal p-2 rounded-xl text-white font-bold text-xl shadow">🏫</div>
                 <div>
-                    <h1 class="text-xl font-bold">مدرسة الرمادي المحدثة</h1>
+                    <h1 class="text-lg font-bold">مدرسة الرمادي المحدثة</h1>
                     <p class="text-xs text-brand-50">منصة الإدارة والتعليم الإلكتروني</p>
                 </div>
             </div>
             <div id="nav-auth-section">
-                <button onclick="openLoginModal()" class="bg-brand-teal hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">تسجيل الدخول</button>
+                <button onclick="openLoginModal()" class="bg-brand-teal hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow">تسجيل الدخول</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
-        <!-- Landing Section -->
-        <div id="landing-view" class="space-y-8">
-            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center space-y-4">
-                <h2 class="text-3xl font-black text-brand-800">مرحباً بكم في مدرسة الرمادي المحدثة</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">منظومة تعليمية متكاملة لإدارة الطلاب، المعلمين، الحضور والتقييمات بكل سلاسة وأمان.</p>
-                <div class="pt-4 flex justify-center gap-4">
-                    <button onclick="openLoginModal()" class="bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-700 shadow-md">دخول النظام</button>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+        <!-- Landing & Directory View -->
+        <div id="main-view" class="space-y-6">
+            <div class="bg-gradient-to-br from-brand-800 to-brand-600 text-white rounded-3xl p-6 sm:p-10 shadow-lg text-center space-y-4">
+                <h2 class="text-2xl sm:text-4xl font-black">مرحباً بكم في مدرسة الرمادي المحدثة</h2>
+                <p class="text-brand-50 text-sm sm:text-base max-w-2xl mx-auto">منظومة رقمية متكاملة لربط الإدارة، المعلمين، والطلاب وأولياء الأمور بكفاءة عالية وتجربة مستخدم سلسة.</p>
+                <div class="pt-2">
+                    <button onclick="openLoginModal()" class="bg-brand-teal hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-2xl shadow transition">دخول البوابة الإلكترونية</button>
+                </div>
+            </div>
+
+            <!-- Public Directory Section -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <h3 class="text-xl font-bold text-brand-800 border-b pb-3">دليل الإدارة والكادر التدريسي</h3>
+                <div id="public-staff-directory" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-500">جاري تحميل الدليل من قاعدة البيانات...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Dynamic Portal Views -->
-        <div id="app-view" class="hidden">
-            <!-- سيتم تحميل لوحات التحكم هنا ديناميكياً حسب الصلاحية -->
+        <!-- Dashboard Containers (Hidden by default) -->
+        <div id="dashboard-view" class="hidden space-y-6">
+            <!-- لوحات التحكم -->
         </div>
     </main>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div class="flex justify-between items-center">
+    <div id="login-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="text-lg font-bold text-brand-800">تسجيل الدخول للنظام</h3>
-                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
             </div>
-            <div class="space-y-3">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-1">البريد الإلكتروني أو رمز الدخول:</label>
-                    <input type="text" id="login-email" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="أدخل البريد أو رمز الوصول">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">البريد الإلكتروني / رمز الوصول:</label>
+                    <input type="text" id="login-email" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="example@domain.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">كلمة المرور:</label>
-                    <input type="password" id="login-password" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="••••••••">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور:</label>
+                    <input type="password" id="login-password" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="••••••••">
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-brand-600 text-white py-2 rounded-lg font-bold hover:bg-brand-700 transition">دخول</button>
+                <button onclick="handleLogin()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition shadow">تسجيل الدخول</button>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        جميع الحقوق محفوظة © 2026 - مدرسة الرمادي المحدثة
+        منصة مدرسة الرمادي المحدثة © 2026 - جميع الحقوق محفوظة
     </footer>
 
-    <!-- App Logic Script -->
+    <!-- Application Script Logic -->
     <script>
-        // إعدادات اتصال Supabase (قم بتحديثها بالقيم الخاصة بك لاحقاً)
-        const SUPABASE_URL = 'https://your-project-id.supabase.co';
-        const SUPABASE_ANON_KEY = 'your-anon-key-here';
-        
+        // إعدادات اتصال Supabase الحقيقية المرتبطة بمشروعك
+        const SUPABASE_URL = 'https://vvuyzlaomnpasnzljqlo.supabase.co';
+        const SUPABASE_ANON_KEY = 'Sb_publishable_ny6Xjk-7TdgMcYRHdYDYzg_mKHyTRVi';
+
         let supabaseClient = null;
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase Connected Successfully');
         } catch (e) {
-            console.log('Supabase not fully configured yet');
+            console.error('Supabase initialization error:', e);
         }
 
         function openLoginModal() {
@@ -112,10 +122,62 @@
         function closeLoginModal() {
             document.getElementById('login-modal').classList.add('hidden');
         }
-        function handleLogin() {
-            alert('جاري التحقق من بيانات الدخول...');
-            closeLoginModal();
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if(!email || !password) {
+                alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                alert('تم تسجيل الدخول بنجاح!');
+                closeLoginModal();
+                loadUserDashboard(data.user);
+            } catch (err) {
+                alert('خطأ في تسجيل الدخول: ' + err.message);
+            }
         }
+
+        function loadUserDashboard(user) {
+            document.getElementById('main-view').classList.add('hidden');
+            const dash = document.getElementById('dashboard-view');
+            dash.classList.remove('hidden');
+            dash.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                    <h2 class="text-xl font-bold text-brand-800">مرحباً بك في لوحة التحكم</h2>
+                    <p class="text-sm text-slate-600">تم تسجيل الدخول بنجاح بحسابك (${user.email}).</p>
+                    <button onclick="location.reload()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold">تسجيل الخروج</button>
+                </div>
+            `;
+        }
+
+        // جلب الدليل العام من قاعدة البيانات
+        window.addEventListener('DOMContentLoaded', async () => {
+            const dirDiv = document.getElementById('public-staff-directory');
+            if (!supabaseClient) return;
+            
+            try {
+                const { data, error } = await supabaseClient.from('profiles').select('full_name, role').limit(6);
+                if (error || !data || data.length === 0) {
+                    dirDiv.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-500 col-span-full">لا توجد بيانات مسجلة في الدليل حالياً. أضف مستخدمين من لوحة الإدارة.</div>`;
+                    return;
+                }
+                
+                dirDiv.innerHTML = data.map(person => `
+                    <div class="p-4 border rounded-xl bg-slate-50 text-center">
+                        <p class="font-bold text-brand-800">${person.full_name}</p>
+                        <p class="text-xs text-slate-500 mt-1">الرتبة: ${person.role}</p>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        });
     </script>
 </body>
 </html>
