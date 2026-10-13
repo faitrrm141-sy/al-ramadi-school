@@ -85,8 +85,8 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">البريد الإلكتروني / رمز الوصول:</label>
-                    <input type="text" id="login-email" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="example@domain.com">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">البريد الإلكتروني:</label>
+                    <input type="email" id="login-email" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none" placeholder="admin@school.com">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور:</label>
@@ -104,14 +104,14 @@
 
     <!-- Application Script Logic -->
     <script>
-        // إعدادات اتصال Supabase باستخدام مفتاح الـ Publishable الجديد
+        // إعدادات اتصال Supabase بالمفتاح العام الصحيح
         const SUPABASE_URL = 'https://vvuyzlaomnpasnzljqlo.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ny6Xjk-7TdgMcYRHdYDYzg_mKHyTRVi';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ny6Xjk-7TdgMcYRHdYDYzg_mKHyTRVi';
 
         let supabaseClient = null;
         try {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase Connected Successfully');
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+            console.log('Supabase Initialized Successfully');
         } catch (e) {
             console.error('Supabase initialization error:', e);
         }
@@ -124,8 +124,8 @@
         }
 
         async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
             
             if(!email || !password) {
                 alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
@@ -135,11 +135,13 @@
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) throw error;
+                
                 alert('تم تسجيل الدخول بنجاح!');
                 closeLoginModal();
                 loadUserDashboard(data.user);
             } catch (err) {
-                alert('خطأ في تسجيل الدخول: ' + err.message);
+                console.error('Login error details:', err);
+                alert('خطأ في تسجيل الدخول: ' + (err.message || 'تعذر الاتصال بالخادم'));
             }
         }
 
@@ -175,7 +177,7 @@
                     </div>
                 `).join('');
             } catch (e) {
-                console.error(e);
+                console.error('Directory fetch error:', e);
             }
         });
     </script>
